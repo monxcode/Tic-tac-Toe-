@@ -1,140 +1,22 @@
-<!--   
-  ------------------------------------------------------------  
-  © 2025 MONXCODE™ | All Rights Reserved  
-  Created by: Mohan Singh Parmar  
-  
-  This project (including code, design, and logic) is protected  
-  under proprietary rights. Unauthorized copying, editing,   
-  reuploading, or commercial usage is strictly prohibited.  
-  
-  For license, permission, or collaborations:  
-  📩 Email: parmarmohansingh26@gmail.com  
-  ------------------------------------------------------------  
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tic Tac Toe - MONXCODE</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #121212;
-      --fg: #ffffff;
-      --accent: #00bcd4;
-      --hover: #1de9b6;
-    }
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Poppins', sans-serif;
-      background: var(--bg);
-      color: var(--fg);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-    h1 {
-      text-align: center;
-      line-height: 1.3;
-      margin-bottom: 10px;
-    }
-    h1 span:first-child {
-      font-family: 'Pacifico', cursive;
-      font-size: 3rem;
-      color: white;
-      text-shadow: 2px 2px 5px #000;
-    }
-    h1 span:last-child {
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.9rem;
-      color: #ffffffaa;
-      letter-spacing: 1px;
-    }
-    .controls {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .scoreboard {
-      display: flex;
-      gap: 20px;
-      margin-bottom: 10px;
-    }
-    .scoreboard div {
-      background: #1f1f1f;
-      padding: 6px 14px;
-      border-radius: 8px;
-      font-size: 0.9rem;
-    }
-    button {
-      padding: 8px 16px;
-      background-color: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-    .game {
-      display: grid;
-      grid-template-columns: repeat(3, 80px);
-      grid-gap: 10px;
-    }
-    .cell {
-      width: 80px;
-      height: 80px;
-      background: #1f1f1f;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    .cell:hover {
-      background: var(--hover);
-    }
-    .info {
-      margin-top: 15px;
-      font-size: 1.2rem;
-      min-height: 40px;
-      opacity: 0;
-      animation: fadein 0.5s forwards;
-    }
-    .trophy {
-      margin-top: 10px;
-      display: none;
-      animation: fadein 0.8s forwards;
-    }
-    @keyframes fadein {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <h1>
-  <span>Tic Tac Toe</span><br/>
-  <a href="https://monxcode.github.io/monxcode/" target="_blank" style="
-    color: #ffffffaa; 
-    text-decoration: none; 
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.9rem;
-    letter-spacing: 1px;
-    display: inline-block;
-    margin-top: 5px;
-  ">
-    Creator: © MONXCODE/20% AI
-  </a>
-</h1>
+    <span>Tic Tac Toe</span><br />
+    <a href="https://monxcode.github.io/monxcode/" target="_blank">
+      Creator: © MONXCODE/20% AI
+    </a>
+  </h1>
+
   <div class="controls">
-    <button onclick="resetGame()">Reset</button>
+    <button onclick="resetGame()" id="resetBtn">Reset</button>
     <button onclick="toggleMode()" id="modeBtn">Mode: Vs AI</button>
   </div>
 
@@ -148,178 +30,11 @@
   <div class="info" id="info">Your Turn</div>
   <div class="trophy" id="trophy"></div>
 
+  <!-- Sounds -->
   <audio id="clickSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_e6d6c708b2.mp3?filename=menu-click-110267.mp3"></audio>
   <audio id="winSound" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_d47f9f6c83.mp3?filename=correct-answer-2-100378.mp3"></audio>
   <audio id="drawSound" src="https://cdn.pixabay.com/download/audio/2022/03/26/audio_10ae648cb3.mp3?filename=video-game-win-jingle-2066.mp3"></audio>
 
-  <script>
-    const gameContainer = document.getElementById("game");
-    const info = document.getElementById("info");
-    const trophy = document.getElementById("trophy");
-    const modeBtn = document.getElementById("modeBtn");
-    const clickSound = document.getElementById("clickSound");
-    const winSound = document.getElementById("winSound");
-    const drawSound = document.getElementById("drawSound");
-
-    let board = Array(9).fill("");
-    let currentPlayer = "X";
-    let gameActive = true;
-    let vsAI = true;
-    let scoreX = 0, scoreO = 0, scoreAI = 0;
-
-    function drawBoard() {
-      gameContainer.innerHTML = "";
-      board.forEach((cell, index) => {
-        const div = document.createElement("div");
-        div.className = "cell";
-        div.dataset.index = index;
-        div.textContent = cell;
-        div.onclick = () => handleClick(index);
-        gameContainer.appendChild(div);
-      });
-    }
-
-    function handleClick(idx) {
-      if (board[idx] || !gameActive) return;
-      board[idx] = currentPlayer;
-      clickSound.play();
-      drawBoard();
-      if (checkWin(currentPlayer)) {
-        winSound.play();
-        gameActive = false;
-        showTrophy(currentPlayer);
-        updateScore(currentPlayer);
-        return;
-      }
-      if (board.every(cell => cell)) {
-        drawSound.play();
-        info.textContent = "😐 It's a Draw!";
-        return;
-      }
-
-      if (vsAI && currentPlayer === "X") {
-        info.textContent = "AI is Thinking...";
-        setTimeout(() => {
-          let move = bestMove();
-          if (move !== -1) {
-            board[move] = "O";
-            clickSound.play();
-            drawBoard();
-            if (checkWin("O")) {
-              winSound.play();
-              info.textContent = "😈 You Lose to AI!";
-              showTrophy("AI");
-              updateScore("AI");
-              gameActive = false;
-            } else if (board.every(cell => cell)) {
-              drawSound.play();
-              info.textContent = "😐 It's a Draw!";
-            } else {
-              info.textContent = "Your Turn";
-            }
-          }
-        }, 400);
-      } else {
-        currentPlayer = currentPlayer === "X" ? "O" : "X";
-        info.textContent = currentPlayer + "'s Turn";
-      }
-    }
-
-    function bestMove() {
-      // Try to win
-      for (let i = 0; i < board.length; i++) {
-        if (!board[i]) {
-          board[i] = "O";
-          if (checkWin("O")) {
-            board[i] = "";
-            return i;
-          }
-          board[i] = "";
-        }
-      }
-
-      // Block player from winning
-      for (let i = 0; i < board.length; i++) {
-        if (!board[i]) {
-          board[i] = "X";
-          if (checkWin("X")) {
-            board[i] = "";
-            return i;
-          }
-          board[i] = "";
-        }
-      }
-
-      // Take center
-      if (!board[4]) return 4;
-
-      // Take corners
-      const corners = [0, 2, 6, 8];
-      const availableCorners = corners.filter(i => !board[i]);
-      if (availableCorners.length > 0) {
-        return availableCorners[Math.floor(Math.random() * availableCorners.length)];
-      }
-
-      // Take sides
-      const sides = [1, 3, 5, 7];
-      const availableSides = sides.filter(i => !board[i]);
-      if (availableSides.length > 0) {
-        return availableSides[Math.floor(Math.random() * availableSides.length)];
-      }
-
-      return -1;
-    }
-
-    function checkWin(p) {
-      const wins = [
-        [0,1,2],[3,4,5],[6,7,8],
-        [0,3,6],[1,4,7],[2,5,8],
-        [0,4,8],[2,4,6]
-      ];
-      return wins.some(combo => combo.every(i => board[i] === p));
-    }
-
-    function resetGame() {
-      board = Array(9).fill("");
-      currentPlayer = "X";
-      gameActive = true;
-      trophy.style.display = "none";
-      info.textContent = vsAI ? "Your Turn" : currentPlayer + "'s Turn";
-      drawBoard();
-    }
-
-    function toggleMode() {
-      vsAI = !vsAI;
-      modeBtn.textContent = vsAI ? "Mode: Vs AI" : "Mode: P vs P";
-      resetGame();
-    }
-
-    function showTrophy(winner) {
-      let svg;
-      if (vsAI && winner === "X") {
-        info.textContent = "🎉 You're the Master!";
-        svg = `🏆`;
-      } else if (winner === "AI" || (vsAI && winner === "O")) {
-        info.textContent = "🤖 You Lose to AI!";
-        svg = `🤖`;
-      } else {
-        info.textContent = `🎉 ${winner} Wins!`;
-        svg = `🏆 <span style='font-size:1.5rem;'>(${winner})</span>`;
-      }
-      trophy.innerHTML = `<div style='font-size:3rem;'>${svg}</div>`;
-      trophy.style.display = "block";
-    }
-
-    function updateScore(winner) {
-      if (winner === "X") scoreX++;
-      if (winner === "O") scoreO++;
-      if (winner === "AI") scoreAI++;
-      document.getElementById("scoreX").textContent = `X Wins: ${scoreX}`;
-      document.getElementById("scoreO").textContent = `O Wins: ${scoreO}`;
-      document.getElementById("scoreAI").textContent = `AI Wins: ${scoreAI}`;
-    }
-
-    drawBoard();
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
