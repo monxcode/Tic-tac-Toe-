@@ -172,7 +172,7 @@ function resetGame() {
 
 function toggleMode() {
   vsAI = !vsAI;
-  modeBtn.textContent = vsAI ? 'Mode: Vs AI' : 'Mode: P vs P';
+  modeBtn.textContent = vsAI ? 'You Vs AI' : 'P vs P';
   resetGame();
   if (!vsAI) info.textContent = currentPlayer + "'s Turn";
 }
