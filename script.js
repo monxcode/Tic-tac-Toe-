@@ -192,7 +192,57 @@ function showTrophy(winner) {
   trophy.innerHTML = `<div style='font-size:3rem;'>${svg}</div>`;
   trophy.style.display = 'block';
 }
+// --- Unbeatable AI (Minimax + Alpha-Beta) ---
 
+function bestMove() {
+  const result = minimax(board.slice(), 'O', 0, -Infinity, Infinity);
+  return result.move === null ? -1 : result.move;
+}
+
+function winnerOn(state) {
+  for (const combo of WIN_LINES) {
+    const [a, b, c] = combo;
+    if (state[a] && state[a] === state[b] && state[a] === state[c]) {
+      return state[a]; // 'X' or 'O'
+    }
+  }
+  // full board = draw
+  if (state.every(cell => cell)) return 'draw';
+  return null; // game not over
+}
+
+function minimax(state, player, depth, alpha, beta) {
+  const outcome = winnerOn(state);
+  if (outcome) {
+    // depth factor: जल्दी जीत = बेहतर, देर से हार = थोड़ा बेहतर
+    if (outcome === 'O') return { score: 10 - depth, move: null };   // AI wins
+    if (outcome === 'X') return { score: depth - 10, move: null };   // Human wins
+    return { score: 0, move: null };                                 // draw
+  }
+
+  const isMax = (player === 'O'); // AI maximizer
+  let best = { score: isMax ? -Infinity : Infinity, move: null };
+
+  for (let i = 0; i < 9; i++) {
+    if (!state[i]) {
+      state[i] = player;
+      const next = (player === 'O') ? 'X' : 'O';
+      const evalScore = minimax(state, next, depth + 1, alpha, beta).score;
+      state[i] = '';
+
+      if (isMax) {
+        if (evalScore > best.score) best = { score: evalScore, move: i };
+        alpha = Math.max(alpha, evalScore);
+      } else {
+        if (evalScore < best.score) best = { score: evalScore, move: i };
+        beta = Math.min(beta, evalScore);
+      }
+
+      if (beta <= alpha) break; // alpha-beta pruning
+    }
+  }
+  return best;
+}
 function updateScore(winner) {
   if (winner === 'X') scoreX++;
   if (winner === 'O') scoreO++;
